@@ -37,6 +37,7 @@ from bfx import gq_seq_utils
 from bfx import mummer
 from bfx import pacbio_tools
 from bfx import smrtanalysis
+from bfx import blat
 from pipelines import common
 
 log = logging.getLogger(__name__)
@@ -486,6 +487,53 @@ pandoc --to=markdown \\
 
         return jobs
 
+    # Selection test code
+    def blat(self):
+        """
+        BLAT the largest polished contig against a reference sequence.
+        """
+
+        jobs = []
+
+        for sample in self.samples:
+            for coverage_cutoff in config.param('DEFAULT', 'coverage_cutoff', type='list'):
+                # directory pathnames
+                cutoff_x = coverage_cutoff + "X"
+                coverage_directory = os.path.join(sample.name, cutoff_x)
+                preassembly_directory = os.path.join(coverage_directory, "preassembly", "data")
+
+                for mer_size in config.param('DEFAULT', 'mer_sizes', type='list'):
+                    # directory pathnames
+                    mer_size_text = "merSize" + mer_size
+                    mer_size_directory = os.path.join(coverage_directory, mer_size_text)
+                    blat_directory = os.path.join(mer_size_directory, "blat")
+
+                    polishing_rounds = config.param('DEFAULT', 'polishing_rounds', type='posint')
+                    if polishing_rounds > 4:
+                        raise Exception("Error: polishing_rounds \"" + str(polishing_rounds) + "\" is invalid (should be between 1 and 4)!")
+
+                    # locate final consensus contig
+                    polishing_round_directory = os.path.join(mer_size_directory, "polishing" + str(polishing_rounds))
+                    sample_cutoff_mer_size = "_".join([sample.name, cutoff_x, mer_size_text])
+
+                    # output file for blat, default is a TSV file
+                    blat_report = os.path.join(blat_directory, 'blat_report.psl')
+                    # fetch reference db from config file
+                    reference_db = config.param('blat', 'reference', type='filepath')
+
+                    # blat_dna_vs_dna(ref, query, output, other_options="")
+                    # ref: reference_db
+                    # query: consensus.fasta
+                    # output: blat_report.psl
+                    jobs.append(concat_jobs([
+                        Job(command="mkdir -p " + blat_directory),
+                        blat.blat_dna_vs_dna(
+                            reference_db,
+                            os.path.join(polishing_round_directory, 'data', 'consensus.fasta'),
+                            blat_report)
+                    ], name='blat_dna_vs_dna.' + sample_cutoff_mer_size))
+        return jobs
+
     def blast(self):
         """
         Blast polished assembly against nr using dc-megablast.
@@ -699,6 +747,7 @@ pandoc --to=markdown \\
             self.assembly,
             self.polishing,
             self.pacbio_tools_assembly_stats,
+            self.blat,
             self.blast,
             self.mummer,
             self.compile
