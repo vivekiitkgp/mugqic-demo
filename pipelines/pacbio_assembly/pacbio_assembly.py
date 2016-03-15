@@ -37,6 +37,8 @@ from bfx import gq_seq_utils
 from bfx import mummer
 from bfx import pacbio_tools
 from bfx import smrtanalysis
+from bfx import blat
+from bfx import exonerate
 from pipelines import common
 
 log = logging.getLogger(__name__)
@@ -486,6 +488,90 @@ pandoc --to=markdown \\
 
         return jobs
 
+    # Selection test code
+    def blat(self):
+        """
+        BLAT the largest contig against a reference sequence.
+        """
+
+        jobs = []
+
+        def largest_contig_id(contig_lengths_f):
+            # Return the sequence_id of largest contig
+            with open(contig_lengths_f) as f:
+                pairs = [x.split() for x in f.readlines()]
+            return max(pairs)[1]
+
+
+        for sample in self.samples:
+            for coverage_cutoff in config.param('DEFAULT', 'coverage_cutoff', type='list'):
+                # directory pathnames
+                cutoff_x = coverage_cutoff + "X"
+                coverage_directory = os.path.join(sample.name, cutoff_x)
+
+                for mer_size in config.param('DEFAULT', 'mer_sizes', type='list'):
+                    # directory pathnames
+                    mer_size_text = "merSize" + mer_size
+                    sample_cutoff_mer_size = "_".join([sample.name, cutoff_x, mer_size_text])
+                    mer_size_directory = os.path.join(coverage_directory, mer_size_text)
+                    assembly_directory = os.path.join(mer_size_directory, "assembly")
+                    blat_directory = os.path.join(mer_size_directory, "blat")
+
+                    # locate contig file
+                    contig_fasta = os.path.join(assembly_directory,
+                                                "9-terminator",
+                                                sample_cutoff_mer_size + ".ctg.fasta")
+
+                    # run fastalength to find length of contigs, extract largest
+                    # contig
+
+                    contig_lengths_f = os.path.join(assembly_directory,
+                                                    sample_cutoff_mer_size + '_contig_lengths.txt')
+                    job = exonerate.fastalength(
+                            contig_fasta,
+                            contig_lengths_f)
+                    job.name = "exonerate_fastalength." + sample_cutoff_mer_size
+                    jobs.append(job)
+
+                    # create index, extract sequence id of largest contig,
+                    # extract sequence
+
+                    index_file = os.path.join(assembly_directory,
+                                              sample_cutoff_mer_size + '.ctg.fasta.index')
+
+                    largest_contig_f = os.path.join(assembly_directory,
+                                                    sample_cutoff_mer_size + '_largest.ctg.fasta')
+
+                    jobs.append(concat_jobs([
+                        exonerate.fastaindex(
+                            contig_fasta,
+                            index_file),
+                        exonerate.fastafetch(
+                            largest_contig_id(largest_contig_f),
+                            contig_fasta,
+                            index_file,
+                            largest_contig_f
+                        )
+                    ], name='exonerate_largestcontig.' + sample_cutoff_mer_size))
+
+                    # output file for blat, default is a TSV file
+                    blat_report = os.path.join(blat_directory, 'blat_report.psl')
+                    # fetch reference db from config file
+                    reference_db = config.param('blat', 'reference', type='filepath')
+
+                    # blat_dna_vs_dna(ref, query, output, other_options="")
+                    # ref: reference_db
+                    # query: largest_contig.fasta
+                    # output: blat_report.psl
+                    jobs.append(concat_jobs([
+                        Job(command="mkdir -p " + blat_directory),
+                        blat.blat_dna_vs_dna(
+                            reference_db,
+                            largest_contig,
+                            blat_report)
+                    ], name='blat_dna_vs_dna.' + sample_cutoff_mer_size))
+        return jobs
+
     def blast(self):
         """
         Blast polished assembly against nr using dc-megablast.
@@ -699,6 +785,7 @@ pandoc --to=markdown \\
             self.assembly,
             self.polishing,
             self.pacbio_tools_assembly_stats,
+            self.blat,
             self.blast,
             self.mummer,
             self.compile
