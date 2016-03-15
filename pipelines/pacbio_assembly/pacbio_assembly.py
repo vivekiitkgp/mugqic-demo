@@ -38,6 +38,7 @@ from bfx import mummer
 from bfx import pacbio_tools
 from bfx import smrtanalysis
 from bfx import blat
+from bfx import exonerate
 from pipelines import common
 
 log = logging.getLogger(__name__)
@@ -500,21 +501,54 @@ pandoc --to=markdown \\
                 # directory pathnames
                 cutoff_x = coverage_cutoff + "X"
                 coverage_directory = os.path.join(sample.name, cutoff_x)
-                preassembly_directory = os.path.join(coverage_directory, "preassembly", "data")
 
                 for mer_size in config.param('DEFAULT', 'mer_sizes', type='list'):
                     # directory pathnames
                     mer_size_text = "merSize" + mer_size
+                    sample_cutoff_mer_size = "_".join([sample.name, cutoff_x, mer_size_text])
                     mer_size_directory = os.path.join(coverage_directory, mer_size_text)
+                    assembly_directory = os.path.join(mer_size_directory, "assembly")
                     blat_directory = os.path.join(mer_size_directory, "blat")
 
-                    polishing_rounds = config.param('DEFAULT', 'polishing_rounds', type='posint')
-                    if polishing_rounds > 4:
-                        raise Exception("Error: polishing_rounds \"" + str(polishing_rounds) + "\" is invalid (should be between 1 and 4)!")
+                    # locate contig file
+                    contig_fasta = os.path.join(assembly_directory, "9-terminator", sample_cutoff_mer_size + ".ctg.fasta"),
 
-                    # locate final consensus contig
-                    polishing_round_directory = os.path.join(mer_size_directory, "polishing" + str(polishing_rounds))
-                    sample_cutoff_mer_size = "_".join([sample.name, cutoff_x, mer_size_text])
+                    # run fastalength to find length of contigs, extract largest
+                    # contig
+
+                    contig_lengths_f = os.path.join(assembly_directory,
+                                                    sample_cutoff_mer_size + '_contig_lengths.txt')
+                    job = exonerate.fastalength(
+                            contig_fasta,
+                            contig_lengths_f)
+                    job.name = "exonerate_fastalength." + sample_cutoff_mer_size
+                    jobs.append(job)
+
+                    # create index, extract sequence id of largest contig,
+                    # extract sequence
+
+                    index_file = os.path.join(assembly_directory,
+                                              sample_cutoff_mer_size + '.ctg.fasta.index')
+
+                    largest_contig = os.path.join(assembly_directory,
+                                                  sample_cutoff_mer_size + '_largest.ctg.fasta')
+
+                    # TODO: Need to extract the query sequence id from
+                    # contig_lengths_f.
+                    # Note sure how to access the output of a job if it's not
+                    # a file. fastafetch() neither supports file input nor
+                    # piping works.
+                    jobs.append(concat_jobs([
+                        exonerate.fastaindex(
+                            contig_fasta,
+                            index_file),
+                        exonerate.fastafetch(
+                            query,
+                            contig_fasta,
+                            index_file,
+                            largest_contig
+                        )
+                    ], name='exonerate_largestcontig.' + sample_cutoff_mer_size))
 
                     # output file for blat, default is a TSV file
                     blat_report = os.path.join(blat_directory, 'blat_report.psl')
@@ -523,13 +557,13 @@ pandoc --to=markdown \\
 
                     # blat_dna_vs_dna(ref, query, output, other_options="")
                     # ref: reference_db
-                    # query: consensus.fasta
+                    # query: largest_contig.fasta
                     # output: blat_report.psl
                     jobs.append(concat_jobs([
                         Job(command="mkdir -p " + blat_directory),
                         blat.blat_dna_vs_dna(
                             reference_db,
-                            os.path.join(polishing_round_directory, 'data', 'consensus.fasta'),
+                            largest_contig,
                             blat_report)
                     ], name='blat_dna_vs_dna.' + sample_cutoff_mer_size))
         return jobs
