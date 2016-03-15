@@ -491,10 +491,17 @@ pandoc --to=markdown \\
     # Selection test code
     def blat(self):
         """
-        BLAT the largest polished contig against a reference sequence.
+        BLAT the largest contig against a reference sequence.
         """
 
         jobs = []
+
+        def largest_contig_id(contig_lengths_f):
+            # Return the sequence_id of largest contig
+            with open(contig_lengths_f) as f:
+                pairs = [x.split() for x in f.readlines()]
+            return max(pairs)[1]
+
 
         for sample in self.samples:
             for coverage_cutoff in config.param('DEFAULT', 'coverage_cutoff', type='list'):
@@ -511,7 +518,9 @@ pandoc --to=markdown \\
                     blat_directory = os.path.join(mer_size_directory, "blat")
 
                     # locate contig file
-                    contig_fasta = os.path.join(assembly_directory, "9-terminator", sample_cutoff_mer_size + ".ctg.fasta"),
+                    contig_fasta = os.path.join(assembly_directory,
+                                                "9-terminator",
+                                                sample_cutoff_mer_size + ".ctg.fasta")
 
                     # run fastalength to find length of contigs, extract largest
                     # contig
@@ -530,23 +539,18 @@ pandoc --to=markdown \\
                     index_file = os.path.join(assembly_directory,
                                               sample_cutoff_mer_size + '.ctg.fasta.index')
 
-                    largest_contig = os.path.join(assembly_directory,
-                                                  sample_cutoff_mer_size + '_largest.ctg.fasta')
+                    largest_contig_f = os.path.join(assembly_directory,
+                                                    sample_cutoff_mer_size + '_largest.ctg.fasta')
 
-                    # TODO: Need to extract the query sequence id from
-                    # contig_lengths_f.
-                    # Note sure how to access the output of a job if it's not
-                    # a file. fastafetch() neither supports file input nor
-                    # piping works.
                     jobs.append(concat_jobs([
                         exonerate.fastaindex(
                             contig_fasta,
                             index_file),
                         exonerate.fastafetch(
-                            query,
+                            largest_contig_id(largest_contig_f),
                             contig_fasta,
                             index_file,
-                            largest_contig
+                            largest_contig_f
                         )
                     ], name='exonerate_largestcontig.' + sample_cutoff_mer_size))
 
