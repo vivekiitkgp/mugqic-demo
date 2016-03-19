@@ -8,7 +8,7 @@ Project title: Implement base modification analysis in the *pacbio_assembly* pip
 
 Project short title (30 characters): Improve *pacbio_assembly* pipeline
 
-URL of project idea page: https://bitbucket.org/mugqic/gsoc2016#markdown-header-implement-base-modification-analysis-in-the-pacbio_assembly-pipeline-from-mugqic-pipelines
+URL of project idea page: [Implement base modification analysis in the *pacbio_assembly* pipeline](https://bitbucket.org/mugqic/gsoc2016#markdown-header-implement-base-modification-analysis-in-the-pacbio_assembly-pipeline-from-mugqic-pipelines)
 
 ## Biographical Information
 
@@ -27,7 +27,7 @@ I use [GNU/Linux](https://www.debian.org/releases/squeeze/i386/ch01s02.html.en),
 keep files under [version control](https://git-scm.com/), and edit using
 [Vim](http://vim.org).
 
-Languages I use: Python, Ruby, JavaScript, MATLAB, BASH. <br>
+Languages I use: Python, Ruby, JavaScript, MATLAB, BASH.
 
 In addition, sequencing data analysis poses a significant challenge
 
@@ -53,9 +53,9 @@ Twitter: https://twitter.com/vivek_ziel
 
 ## Student Affiliation
 
-Institution: Indian Institute of Technology Kharagpur
+Institution: **Indian Institute of Technology Kharagpur**
 
-Program: Integrated Dual Degree (Bachelor’s and Master’s)
+Program: *Integrated Dual Degree (Bachelor’s and Master’s)*
 
 Stage of completion: 8th semester, 2017 (expected graduation)
 
@@ -75,17 +75,22 @@ I believe that the two experiences, if selected, could be complementary.
 
 Mentor names: Mathieu Bourgey, Edouard Henrion, Gary Leveque
 
-Mentor emails: mathieu.bourgey@computationalgenomics.ca, edouard.henrion@computationalgenomics.ca, gary.leveque@computationalgenomics.ca
+Mentor emails:
+[mathieu.bourgey@...](mailto:mathieu.bourgey@computationalgenomics.ca),
+[edouard.henrion@...](mailto:edouard.henrion@computationalgenomics.ca),
+[gary.leveque@...](mailto:gary.leveque@computationalgenomics.ca)
 
 I have been in touch with the mentors since organization announcement through
 email.
 
 ## Synopsis
 
- Single Molecule, Real Time (SMRT) analysis is an exciting technology by Pacific
- Biosciences for the detection of DNA sequences and DNA base modifications. SMRT
- Sequencing identifies bases at each position using kinetic information recorded
- during each nucleotide addition step.[1] The same information can also be used to
+ [Single Molecule, Real
+ Time](http://www.pacb.com/products-and-services/analytical-software/smrt-analysis/)
+ (SMRT) analysis is an exciting technology by Pacific Biosciences for the
+ detection of DNA sequences and DNA base modifications. SMRT Sequencing
+ identifies bases at each position using kinetic information recorded during
+ each nucleotide addition step.[1] The same information can also be used to
  distinguish modified and native bases by compare results of SMRT Sequencing to
  an *in silico* kinetic reference for dynamics without modifications. MUGQIC
  pipelines currently consist of a general basic analysis implementation of
@@ -165,7 +170,7 @@ modifications in prokaryotic genomes, specifically the methylome pattern.
 
 The command line API of MotifMaker is shown below.
 
-```
+```bash
 $ java -jar target/motif-maker-0.2.one-jar.jar
 
 Usage: MotifMaker [options] [command] [command options]
@@ -233,11 +238,57 @@ assembly) and a reference FASTA file.
 >
 > Can you please explain what does the SMRTportal repository entry refers to?
 
+Currently, the `pacbio_assembly.py` script implements the following main steps
+of creating genome assembly.
 
-Describe in detail your plan for completing the work.  What functions will be
-written, how and when will you do design, how will you verify the results of
-your coding?  Each project is different, please make your application
-appropriate to the work you propose.
+* `smrtanalysis_filtering()`
+* `pacbio_tools_get_cutoff()`
+* `preassembly()`
+* `assembly()`
+* `polishing()`
+
+In the `polishing()` stage, aligned reads (`aligned_reads.cmp.h5`) are generated
+in the `$polishing_round_directory/data`. This directory can be directly used as
+an input source for the `kineticsTools` scripts and the output can be stored in
+the same directory for later access by `MotifMaker`.
+
+We will add the functions to handle the `kineticsTools` programs input and
+output as `bfx/kineticstools.py` with two main functions corresponding to the
+two programs. Similarly, we will add functions for MotifMaker’s `find` and
+`reprocess` commands in `bfx/motifmaker.py`.
+
+* all input arguments will consume file path to the respective alignment,
+    reference FASTA, output and other accessory files, extra options may be
+    supported as required.
+
+```python
+>>> ktools_idp_analysis().__doc__
+""" Run kineticsTools on the input files to generate base modification iDP
+    pattern.
+
+    Args:
+
+    Returns:
+"""
+
+>>> motifmaker_find().__doc__
+""" Run MotifMaker’s find program to search for motifs.
+
+    Args:
+
+    Returns:
+"""
+```
+
+### Documentation
+
+> TODO:
+
+### Testing
+
+> ### Request comment:
+>
+> How to verify the results of the coding? In other words, testing changes?
 
 ### Challenges
 
@@ -276,13 +327,7 @@ appropriate to the work you propose.
 
 ## Timeline
 
-(consult GSOC schedule)
-
-Provide a detailed timeline of how you plan to spend your summer, organized by
-deliverables. Don't leave testing and documentation for last, as that's almost
-a guarantee of a failed project. 
-
-What is your contingency plan for things not going to schedule?
+> TODO:
 
 ### Community Bonding Period
 
@@ -297,7 +342,6 @@ What is your contingency plan for things not going to schedule?
 ### Week 9 - Week 10
 
 ### Week 11 - Week 12
-
 
 ## Management of Coding Project
 
