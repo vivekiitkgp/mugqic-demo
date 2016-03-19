@@ -80,7 +80,7 @@ Mentor emails: mathieu.bourgey@computationalgenomics.ca, edouard.henrion@computa
 I have been in touch with the mentors since organization announcement through
 email.
 
-## Synopsis (max 150 words)
+## Synopsis
 
  Single Molecule, Real Time (SMRT) analysis is an exciting technology by Pacific
  Biosciences for the detection of DNA sequences and DNA base modifications. SMRT
@@ -96,7 +96,7 @@ email.
  pursuing more in-depth base modification studies or searching for epigenetics
  markers.
 
-##  Benefits to Community (max 250 words)
+##  Benefits to Community
 
  Advent of next-generation sequencing platforms and their continuous improvement
  has led to a data explosion problem. The corresponding progress in the research
@@ -132,10 +132,6 @@ email.
  engineers alike, learn about latest developments, work hands-on handling large
  amount of data and processing. Essentially, a lot of tricky details to learn
  that are available only though a practical experience.
-
- >  The scripts essentially create a list of Bash command jobs, resolve
- >  dependencies between them and smart error
- >  recovery should any command fail in the pipeline.
 
 ## Coding Plan & Methods
 
@@ -228,8 +224,7 @@ dependency will be installed and made available as a command line commands
 containing alignments (which is generated in the `polishing()` step of the
 assembly) and a reference FASTA file.
 
-> Request comment:
-> ---------------
+> ### Request comment:
 >
 > The kineticsTools documentation says the following about reference sequence
 > file:
@@ -246,13 +241,15 @@ appropriate to the work you propose.
 
 ### Challenges
 
-* Unfamiliarity with working on clusters
+* **Unfamiliarity with working on clusters**
+
     The pipelines and their algorithms rely heavily on use of multi-node
     clusters for parallel processing and fast computing. I believe it would
     require a bit of exposure to learn about necessary cluster operations, how
     **jobs** are organized, submitted and executed.
 
-* Navigating through the code
+* **Navigating through the code**
+
     The existing documentation for functions and module describe the structure
     in a very high-level manner, which might be a bit confusing to someone
     inexperienced. I plan to heavily document the code to be added from this
@@ -262,7 +259,8 @@ appropriate to the work you propose.
     tutorials (using information from my weekly log), and improve existing
     READMEs.
 
-* De-duplication and code quality
+* **De-duplication and code quality**
+
     The code is quite redundant at places (e.g., pacbio_assembly.py), increasing
     overall complexity and reducing the readability. By careful use of
     Python decorators relevant sections of the code can be abstracted into
@@ -331,6 +329,7 @@ A demo analysis step was implemented in the *pacbio_assembly* pipeline. The
 changes are intended to perform the following steps:
 
 ✓ Read the path of a reference sequence from the config `.ini` file.
+
 ✓ `BLAT` the largest contig against the reference sequence from the previous step.
 
 The changes are available in the [GitHub
@@ -339,5 +338,6 @@ request.
 
 ## References
 
-[1]: http://nar.oxfordjournals.org/content/early/2011/12/07/nar.gkr1146.full
-[2]: https://github.com/PacificBiosciences/kineticsTools/blob/master/doc/manual.rst#reference-sequence
+[1]: [http://nar.oxfordjournals.org/content/early/2011/12/07/nar.gkr1146.full](http://nar.oxfordjournals.org/content/early/2011/12/07/nar.gkr1146.full)
+[2]: [https://github.com/PacificBiosciences/kineticsTools/blob/master/doc/manual.rst#reference-sequence](https://github.com/PacificBiosciences/kineticsTools/blob/master/doc/manual.rst#reference-sequence)
+
