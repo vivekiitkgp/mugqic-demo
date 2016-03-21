@@ -262,21 +262,30 @@ two programs. Similarly, we will add functions for MotifMaker’s `find` and
     supported as required.
 
 ```python
->>> ktools_idp_analysis().__doc__
+>>> ktools_idp_analysis.__doc__
 """ Run kineticsTools on the input files to generate base modification iDP
     pattern.
 
     Args:
 
     Returns:
+
+    `Job` object which when executed creates the necessary output file as
+    provided in the input arguments.
 """
 
->>> motifmaker_find().__doc__
+>>> motifmaker_find.__doc__
 """ Run MotifMaker’s find program to search for motifs.
 
     Args:
+    fasta - file path to FASTA file
+    modifications - file path to modifications.gff or .gff.gz file
+    min_score - Minimum Qmod score to use in motif finding (Default: 40.0)
 
     Returns:
+
+    `Job` object which when executed saves the necessary CSV output to the
+    file path provided in the input arguments.
 """
 ```
 
@@ -317,31 +326,66 @@ two programs. Similarly, we will add functions for MotifMaker’s `find` and
     Python decorators relevant sections of the code can be abstracted into
     higher-level objects.
 
-    Additionally, following pep8 style guide and using Pythonic styles should
-    allow us to write cleaner, quality and easily maintainable code. To automate
-    these, we may use to use a continuous delivery platform. Unfortunately, the
-    options for BitBucket are limited but [drone.io](https://drone.io) seems
-    promising. On the plus side, [Code climate](https://codeclimate.com/) for
-    code quality score and [coveralls](https://coveralls.io) both can be
-    integrated with BitBucket.
+    Additionally, following [pep8](https://www.python.org/dev/peps/pep-0008/)
+    style guide and using Pythonic styles should allow us to write cleaner,
+    quality and easily maintainable code. To automate these, we may use to use
+    a continuous delivery platform. Unfortunately, the options for BitBucket are
+    limited but [drone.io](https://drone.io) seems promising. On the plus side,
+    [Code climate](https://codeclimate.com/) for code quality score and
+    [coveralls](https://coveralls.io) both can be integrated with BitBucket.
 
 ## Timeline
 
-> TODO:
-
 ### Community Bonding Period
+
+Spend time revising and expanding the proposal adding necessary details.
+Communicate with the mentors and other members of C3G, learn about the work
+and research culture, challenges they face etc., For example, running the
+pipeline on smaller datasets, ensuring that it works.
+
+The main purpose of this period would be further refine the timeline, create
+milestones, create a documentation plan and chalk out the implementation in more
+details.
 
 ### Week 1 - Week 2
 
+* Update project documentation, setup blog/journal for logging progress
+* Improve documentation of `pacbio_assembly` pipeline and the files in `bfx/*`
+    module.
+* Setup code quality, style guide checker tools
+* Bi-weekly summary
+
 ### Week 3 - Week 4
+
+* Work on implementing `kineticsTools` module.
+* Work on improving code quality and readability.
+* Bi-weekly summary
 
 ### Week 5 - Week 6
 
+* Work on overall project documentation.
+* Test code by running on bigger datasets.
+* Bi-weekly summary
+
+**Mid term evaluations**
+
 ### Week 7 - Week 8
+
+* Work on implementing `motifmaker` module.
+* Bi-weekly summary
 
 ### Week 9 - Week 10
 
+* Test code by running on bigger datasets.
+* Bi-weekly summary
+
 ### Week 11 - Week 12
+
+* Improve other modules as time permits.
+
+**Week to scrub code, write tests, focus on documentation.**
+
+**End term evaluations**
 
 ## Management of Coding Project
 
