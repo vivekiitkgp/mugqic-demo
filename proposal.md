@@ -4,7 +4,7 @@
 
 ## Project Info
 
-Project title: Implement base modification analysis in the *pacbio_assembly* pipeline
+Project title: **Implement base modification analysis in the *pacbio_assembly* pipeline**
 
 Project short title (30 characters): Improve *pacbio_assembly* pipeline
 
@@ -33,23 +33,15 @@ In addition, sequencing data analysis poses a significant challenge
 
 ## Contact Information
 
-Student name: Vivek Rai
-
-Telephone(s): +91 8013291569
-
-Email(s): vivekraiiitkgp@gmail.com
-
-Skype: vivekrai.iitkgp
-
-Google+ (Hangouts): vivekraiiitkgp@gmail.com
-
-IRC: vivekrai @ freenode
-
-GitHub: https://github.com/vivekiitkgp
-
-BitBucket: https://bitbucket.com/vivekiitkgp
-
-Twitter: https://twitter.com/vivek_ziel
+* Student name: Vivek Rai
+* Telephone(s): +91 8013291569
+* Email(s): vivekraiiitkgp@gmail.com
+* Skype: vivekrai.iitkgp
+* Google+ (Hangouts): vivekraiiitkgp@gmail.com
+* IRC: vivekrai @ freenode
+* GitHub: https://github.com/vivekiitkgp
+* BitBucket: https://bitbucket.com/vivekiitkgp
+* Twitter: https://twitter.com/vivek_ziel
 
 ## Student Affiliation
 
@@ -262,11 +254,15 @@ two programs. Similarly, we will add functions for MotifMaker’s `find` and
     supported as required.
 
 ```python
->>> ktools_idp_analysis.__doc__
+>>> ktools_idpSummary.__doc__
 """ Run kineticsTools on the input files to generate base modification iDP
     pattern.
 
     Args:
+    reference: Path to reference FASTA file
+    outfile: Path to output file
+    aligned_reads: Path to aligned reads *.cmp.h5 file
+    options: `dict` containing other options e.g., {numworkers, pvalue}
 
     Returns:
 
@@ -291,7 +287,12 @@ two programs. Similarly, we will add functions for MotifMaker’s `find` and
 
 ### Documentation
 
-> TODO:
+* Study code and (re)write function and module level docstrings conforming to
+    [Google Python Style
+    Guide](https://google.github.io/styleguide/pyguide.html) that follows pep
+    proposals.
+
+* Incorporate the description of the added tools in the pipeline workflow.
 
 ### Testing
 
@@ -338,10 +339,11 @@ two programs. Similarly, we will add functions for MotifMaker’s `find` and
 
 ### Community Bonding Period
 
-Spend time revising and expanding the proposal adding necessary details.
-Communicate with the mentors and other members of C3G, learn about the work
-and research culture, challenges they face etc., For example, running the
-pipeline on smaller datasets, ensuring that it works.
+Spend time revising and expanding the proposal adding necessary details (for
+example, TODO and request for comments sections!). Communicate with the mentors
+and other members of C3G, learn about the work and research culture, challenges
+they face etc., For example, running the pipeline on smaller datasets, ensuring
+that it works.
 
 The main purpose of this period would be further refine the timeline, create
 milestones, create a documentation plan and chalk out the implementation in more
@@ -386,6 +388,14 @@ details.
 **Week to scrub code, write tests, focus on documentation.**
 
 **End term evaluations**
+
+The timeline is sufficiently spaced with buffer periods to account for any
+inevitable delays. Consistently discussing and documenting my progress through
+the project will be crucial for successful and timely completion.
+
+In a worst scenario where we hit a major roadblock (possibly due to upstream
+issues in the tools we are dependent on), I request to continue the beyond
+beyond the official timeline as well.
 
 ## Management of Coding Project
 
